@@ -18,11 +18,9 @@ script:
 
 deploy:
   provider: pages
-  strategy: git
   edge: true
   verbose: true
   cleanup: false
   local_dir: ./dist
   on:
     node_js: node
-
