@@ -17,9 +17,12 @@ script:
   - npm run build
 
 deploy:
-  - provider: pages:git
-    edge: true
-    verbose: true
-    on:
-      node_js: node
+  provider: pages
+  strategy: git
+  edge: true
+  verbose: true
+  cleanup: false
+  local_dir: ./dist
+  on:
+    node_js: node
 
