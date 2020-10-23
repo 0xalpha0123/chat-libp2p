@@ -17,6 +17,9 @@ script:
   - npm run build
 
 deploy:
-  provider: pages
-  edge: true
-  verbose: true
+  - provider: pages:git
+    edge: true
+    verbose: true
+    on:
+      node_js: node
+
