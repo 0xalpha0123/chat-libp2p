@@ -10,8 +10,6 @@ import Bootstrap from 'libp2p-bootstrap'
 import Websockets from 'libp2p-websockets'
 import WebRTCStar from 'libp2p-webrtc-star'
 
-import uint8ArrayToString from 'uint8arrays/to-string'
-
 const listeners = [
   '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
   '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star'
@@ -63,12 +61,6 @@ export const create = async () => {
 
   node.connectionManager.on('peer:discovery', console.log)
   node.peerStore.on('peer', console.log)
-
-  node.pubsub.on('chat', msg => {
-    const message = uint8ArrayToString(msg.data)
-    console.log(message)
-  })
-  await node.pubsub.subscribe('chat')
 
   return node
 }
