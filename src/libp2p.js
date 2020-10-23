@@ -1,11 +1,21 @@
 import Libp2p from 'libp2p'
 
+// import TCP from 'libp2p-tcp'
+// import mDNS from 'libp2p-mdns'
 import Mplex from 'libp2p-mplex'
 import KadDHT from 'libp2p-kad-dht'
 import { NOISE } from 'libp2p-noise'
+import Gossipsub from 'libp2p-gossipsub'
 import Bootstrap from 'libp2p-bootstrap'
 import Websockets from 'libp2p-websockets'
 import WebRTCStar from 'libp2p-webrtc-star'
+
+import uint8ArrayToString from 'uint8arrays/to-string'
+
+const listeners = [
+  '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
+  '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star'
+]
 
 const bootstrapers = [
   '/dns4/ams-1.bootstrap.libp2p.io/tcp/443/wss/p2p/QmSoLer265NRgSp2LA3dPaeykiS1J6DifTC88f5uVQKNAd',
@@ -17,25 +27,24 @@ const bootstrapers = [
 ]
 
 export const options = {
+  addresses: {
+    listen: listeners
+  },
   modules: {
     transport: [Websockets, WebRTCStar],
     connEncryption: [NOISE],
     streamMuxer: [Mplex],
     peerDiscovery: [Bootstrap],
-    dht: KadDHT
-  },
-  addresses: {
-    listen: [
-      '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star',
-      '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star'
-    ]
+    dht: KadDHT,
+    pubsub: Gossipsub
   },
   config: {
     dht: {
       enabled: true
     },
     peerDiscovery: {
-      bootstrap: {
+      [Bootstrap.tag]: {
+        enabled: true,
         list: bootstrapers
       }
     }
@@ -51,5 +60,15 @@ export const plugin = {
 export const create = async () => {
   const node = await Libp2p.create(options)
   await node.start()
+
+  node.connectionManager.on('peer:discovery', console.log)
+  node.peerStore.on('peer', console.log)
+
+  node.pubsub.on('chat', msg => {
+    const message = uint8ArrayToString(msg.data)
+    console.log(message)
+  })
+  await node.pubsub.subscribe('chat')
+
   return node
 }
