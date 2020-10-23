@@ -1,0 +1,17 @@
+os: linux
+dist: bionic
+
+language: node_js
+node_js:
+  - 'node'
+  - 'lts/*'
+
+cache:
+  npm: true
+
+install:
+  - npm i
+
+script:
+  - npm run lint
+  - npm run build
