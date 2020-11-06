@@ -59,8 +59,13 @@ export const create = async () => {
   const node = await Libp2p.create(options)
   await node.start()
 
-  node.connectionManager.on('peer:discovery', console.log)
-  node.peerStore.on('peer', console.log)
+  node.connectionManager.on('peer:discovery', peer => {
+    console.log('New peer connected:', peer.toB58String())
+  })
+
+  node.peerStore.on('peer', peer => {
+    console.log('New peer discovered:', peer.toB58String())
+  })
 
   return node
 }
