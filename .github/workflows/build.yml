@@ -16,6 +16,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - uses: JamesIves/github-pages-deploy-action@4.0.0
+        if: github.ref == 'refs/heads/master'
         with:
           branch: gh-pages
           folder: ./dist
