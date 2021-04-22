@@ -14,7 +14,7 @@
     "libp2p-gossipsub": "^0.8.0",
     "libp2p-kad-dht": "^0.21.0",
     "libp2p-mdns": "^0.16.0",
-    "libp2p-mplex": "^0.10.2",
+    "libp2p-mplex": "^0.10.3",
     "libp2p-noise": "^2.0.5",
     "libp2p-webrtc-star": "^0.22.0",
     "libp2p-websockets": "^0.15.6",
