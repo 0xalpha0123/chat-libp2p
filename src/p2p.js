@@ -7,7 +7,7 @@ import KadDHT from 'libp2p-kad-dht'
 import { NOISE } from 'libp2p-noise'
 import Gossipsub from 'libp2p-gossipsub'
 import Bootstrap from 'libp2p-bootstrap'
-import Websockets from 'libp2p-websockets'
+// import Websockets from 'libp2p-websockets'
 import WebRTCStar from 'libp2p-webrtc-star'
 
 const listeners = [
@@ -29,7 +29,7 @@ export const options = {
     listen: listeners
   },
   modules: {
-    transport: [Websockets, WebRTCStar],
+    transport: [WebRTCStar],
     connEncryption: [NOISE],
     streamMuxer: [Mplex],
     peerDiscovery: [Bootstrap],
