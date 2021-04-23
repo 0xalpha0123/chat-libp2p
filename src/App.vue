@@ -22,13 +22,14 @@
     <!-- Peers -->
     <section>
       <h2> Peers </h2>
-      <p> Total peers: {{ peers.length }} </p>
 
       <form @submit.prevent="fetchPeer">
         <label for="peer"> Connect </label>
         <input type="text" name="peer" v-model="peer" placeholder="id">
         <button @press="fetchPeer"> Connect </button>
       </form>
+
+      <p> Total peers: {{ peers.length }} </p>
 
       <ul>
         <li v-for="(item, i) of peers" :key="i"> {{ item.toB58String() }} </li>
