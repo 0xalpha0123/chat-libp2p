@@ -1,34 +1,39 @@
 <template>
   <div id="app">
     <h1> Libp2p chat </h1>
+    <p> Your id: {{ self }} </p>
 
-    <h3> Peers discovered </h3>
-    <p> {{ totalPeers }} </p>
-
-    <h3> Your id: </h3>
-    <p> {{ self }} </p>
-
+    <!-- Connect -->
     <form @submit.prevent="fetchPeer">
       <label for="peer"> Peer </label>
       <input type="text" name="peer" v-model="peer">
       <button @press="fetchPeer"> Connect </button>
     </form>
 
-    <h4> Connected </h4>
-    <ul>
-      <li v-for="peer of peers" :key="peer"> {{ peer }} </li>
-    </ul>
-
+    <!-- Send -->
     <form @submit.prevent="sendMessage">
       <label for="message"> Message </label>
       <input type="text" name="message" v-model="message">
       <button @press="sendMessage"> Send </button>
     </form>
 
-    <h4> Messages </h4>
-    <ul>
-      <li v-for="message of messages" :key="message"> {{ message }} </li>
-    </ul>
+    <!-- Messages -->
+    <section>
+      <h2> Messages </h2>
+      <p> Total messages: {{ messages.length }} </p>
+      <ul>
+        <li v-for="message of messages" :key="message"> {{ message }} </li>
+      </ul>
+    </section>
+
+    <!-- Peers -->
+    <section>
+      <h2> Peers </h2>
+      <p> Total peers: {{ peers.length }} </p>
+      <ul>
+        <li v-for="(item, i) of peers" :key="i"> {{ item.toB58String() }} </li>
+      </ul>
+    </section>
   </div>
 </template>
 
@@ -41,64 +46,46 @@ export default {
   name: 'App',
 
   data: () => ({
-    totalPeers: 0,
-
-    messages: [],
-    message: '',
-
+    peer: '',
     peers: [],
-    peer: ''
+
+    message: '',
+    messages: []
   }),
 
   computed: {
     self () {
-      return this.libp2p.peerId.toB58String()
-    },
-
-    subscribers () {
-      return this.libp2p.pubsub.getSubscribers('chat')
+      return this.$p2p.peerId.toB58String()
     }
   },
 
   methods: {
-    fetchPeer () {
-      const peerId = PeerId.createFromB58String(this.peer)
-      this.libp2p.peerRouting.findPeer(peerId)
-        .then(p => {
-          console.log('Found peer:', p)
-          this.peers.push(this.peer)
-          this.peer = ''
-        })
-        .catch(e => console.error(`Error fetching: ${this.peer}`))
+    async fetchPeer () {
+      const id = PeerId.createFromB58String(this.peer)
+      const peer = await this.$p2p.peerRouting.findPeer(id)
+      this.peers.push(peer.id)
+      this.peer = ''
     },
-
-    sendMessage () {
-      console.log('Sending message:', this.message)
+    async sendMessage () {
       const msg = uint8ArrayFromString(this.message)
-      this.libp2p.pubsub.publish('chat', msg)
+      await this.$p2p.pubsub.publish('chat', msg)
       this.message = ''
     }
   },
 
-  beforeMount () {
-    this.libp2p.pubsub.on('chat', msg => {
+  beforeCreate () {
+    this.$p2p.pubsub.subscribe('chat')
+
+    // New message
+    this.$p2p.pubsub.on('chat', msg => {
       const message = uint8ArrayToString(msg.data)
-      console.log('Received message:', message)
       this.messages.push(message)
     })
 
-    this.libp2p.connectionManager.on('peer:discovery', peer => {
-      console.log('New peer connected:', peer.toB58String())
-      const id = peer.toB58String()
-      this.peers.push(id)
+    // New peer
+    this.$p2p.peerStore.on('peer', peer => {
+      this.peers.push(peer)
     })
-
-    this.libp2p.peerStore.on('peer', peer => {
-      console.log('New peer discovered:', peer.toB58String())
-      this.totalPeers++
-    })
-
-    this.libp2p.pubsub.subscribe('chat')
   }
 }
 </script>
