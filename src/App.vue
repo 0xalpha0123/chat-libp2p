@@ -1,35 +1,35 @@
 <template>
   <div id="app">
-    <h1> Libp2p chat </h1>
+    <h1> P2P chat </h1>
     <p> Your id: {{ self }} </p>
 
-    <!-- Connect -->
-    <form @submit.prevent="fetchPeer">
-      <label for="peer"> Peer </label>
-      <input type="text" name="peer" v-model="peer">
-      <button @press="fetchPeer"> Connect </button>
-    </form>
-
-    <!-- Send -->
-    <form @submit.prevent="sendMessage">
-      <label for="message"> Message </label>
-      <input type="text" name="message" v-model="message">
-      <button @press="sendMessage"> Send </button>
-    </form>
-
-    <!-- Messages -->
+    <!-- Chat -->
     <section>
       <h2> Messages </h2>
       <p> Total messages: {{ messages.length }} </p>
-      <ul>
-        <li v-for="message of messages" :key="message"> {{ message }} </li>
-      </ul>
+
+      <!-- Messages -->
+      <textarea rows="10" readonly v-model="chat" />
+
+      <!-- Send -->
+      <form @submit.prevent="sendMessage">
+        <label for="message"> Message </label>
+        <input type="text" name="message" v-model="message" placeholder="msg">
+        <button @press="sendMessage"> Send </button>
+      </form>
     </section>
 
     <!-- Peers -->
     <section>
       <h2> Peers </h2>
       <p> Total peers: {{ peers.length }} </p>
+
+      <form @submit.prevent="fetchPeer">
+        <label for="peer"> Connect </label>
+        <input type="text" name="peer" v-model="peer" placeholder="id">
+        <button @press="fetchPeer"> Connect </button>
+      </form>
+
       <ul>
         <li v-for="(item, i) of peers" :key="i"> {{ item.toB58String() }} </li>
       </ul>
@@ -56,6 +56,9 @@ export default {
   computed: {
     self () {
       return this.$p2p.peerId.toB58String()
+    },
+    chat () {
+      return this.messages.join('\n')
     }
   },
 
