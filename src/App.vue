@@ -79,13 +79,13 @@ export default {
   },
 
   beforeMount () {
-    this.$p2p.pubsub.subscribe('chat')
-
     // New message
     this.$p2p.pubsub.on('chat', msg => {
       const message = uint8ArrayToString(msg.data)
       this.messages.push(message)
     })
+
+    this.$p2p.pubsub.subscribe('chat')
 
     // New peer
     this.$p2p.peerStore.on('peer', peer => {
