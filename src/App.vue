@@ -69,6 +69,7 @@ export default {
     async sendMessage () {
       const msg = uint8ArrayFromString(this.message)
       await this.$p2p.pubsub.publish('chat', msg)
+      this.messages.push(this.message)
       this.message = ''
     }
   },
