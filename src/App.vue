@@ -74,7 +74,7 @@ export default {
     }
   },
 
-  beforeCreate () {
+  beforeMount () {
     this.$p2p.pubsub.subscribe('chat')
 
     // New message
